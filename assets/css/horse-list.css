@@ -1,0 +1,1082 @@
+.sticky-header {
+  position: sticky;
+  top: 0; /* Sticks to the top of its container when scrolling */
+  background-color: #fff; /* Optional: To ensure the header has a background color */
+  padding: 10px 20px; /* Adds padding to make it look better */
+  margin: 0; /* Removes default margin */
+  z-index: 10; /* Ensures it stays above other content while scrolling */
+  display: flex; /* Flexbox to align contents */
+  justify-content: space-between; /* Space between title and other possible elements */
+  align-items: center; /* Vertically align content */
+  border-bottom: 2px solid #ddd; /* Optional: Adds a subtle bottom border */
+}
+
+.sticky-header i {
+  margin-right: 10px; /* Optional: Adds spacing if there’s an icon before the title */
+}
+
+/* File Gallery Styles */
+.file-item {
+  width: 200px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.file-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.file-thumbnail {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+
+.file-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  background: #f5f5f5;
+  color: #555;
+  font-size: 40px;
+  border-bottom: 1px solid #eee;
+}
+
+.file-icon span {
+  font-size: 12px;
+  margin-top: 5px;
+  color: #777;
+}
+
+.file-details {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-link {
+  color: #333;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  display: inline-block;
+}
+
+.file-link:hover {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.delete-file {
+  background: none;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.no-files-message {
+  color: #777;
+  font-style: italic;
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+}
+
+#horseDetailsSidebar .btn,
+#horseDetailsSidebar button {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+#horseDetailsSidebar {
+  width: 400px;
+  position: fixed;
+  top: 0;
+  right: -400px;
+  height: 100vh;
+  background: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  z-index: 1050;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#horseDetailsContent {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 10px;
+}
+
+/* Sidebar header (horse name) */
+#horseDetailsSidebar h2 {
+  text-align: center;
+  padding: 20px;
+  background-color: #229954;
+  color: white;
+  margin: 0;
+  width: 100%;
+  /* Ensure the heading stretches across */
+  box-sizing: border-box;
+}
+
+.sidebar #horseDetailsContent {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Add only these CSS rules - don't change existing ones */
+.resize-handle:hover {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.1) 0%,
+    transparent 100%
+  ) !important;
+}
+
+#horseDetailsSidebar.resizing {
+  transition: none !important;
+  user-select: none !important;
+}
+
+#horseDetailsSidebar.resizing .resize-handle {
+  background: linear-gradient(
+    to right,
+    rgba(34, 153, 84, 0.3) 0%,
+    transparent 100%
+  ) !important;
+}
+
+.closebtn {
+  position: sticky;
+  top: 60px;
+  right: 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  z-index: 1001;
+  width: 10px;
+  /* Fixed width for a more controlled size */
+  height: 30px;
+  /* Fixed height to make it circular */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Centering the text inside the button */
+  margin-left: auto; /* Pushes it to the right */
+  float: right; /* Ensures it stays on the right */
+}
+
+#horseDetailsSidebar.open {
+  right: 0;
+  width: 60vw;
+  /* Occupies 60% of viewport width when open */
+}
+
+#horseDetailsSidebar.open .sidebar-content {
+  padding: 20px;
+  font-size: 16px;
+}
+
+/* Tabs */
+.tab-buttons {
+  position: sticky;
+  top: 160;
+  background: white;
+  padding: 10px 0;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 5px;
+}
+
+.tab-button {
+  padding: 8px 15px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+/* Container for scrollable content */
+.tab-content-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 10px;
+}
+
+/* Action buttons at bottom */
+.action-buttons {
+  padding: 15px 0;
+  background: white;
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid #eee;
+}
+
+.tab-button.active {
+  border-bottom: 2px solid #007bff;
+  background: #fff;
+  font-weight: bold;
+}
+
+.tab-content {
+  padding: 20px 10px;
+  overflow-y: auto; /* Allows vertical scrolling if content overflows */
+  flex: 1;
+}
+
+/* Hide all tabs by default */
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+/* Improved photo gallery */
+#photoPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+#fileUploadForm {
+  display: block; /* Ensure the form is visible */
+}
+
+.photo-card {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Modal Image Styles */
+#imageModal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  z-index: 10000;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  /* Black background with opacity */
+  overflow: auto;
+  /* Enable scroll if the image is too large */
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
+}
+
+/* Add this separate rule for when the modal is active */
+#imageModal.active {
+  display: flex; /* Show as flex when active */
+  justify-content: center;
+  align-items: center;
+}
+
+#imageModal .modal-content {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  /* Allow the image to expand based on its original width */
+  height: auto;
+  /* Allow the image to expand based on its original height */
+  object-fit: contain;
+  /* Ensure it scales proportionally while fitting in the modal */
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.photo-card:hover {
+  transform: scale(1.03);
+}
+
+.photo-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+}
+
+.photo-card a {
+  display: block;
+  height: 100%;
+}
+
+.delete-photo {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+.uploaded-photo {
+  width: 100px;
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+table td a {
+  color: black;
+  /* Ensure that the links are also black */
+}
+
+table td span {
+  color: black;
+  /* Ensure the spans inside the table cells are black */
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+body {
+  padding: 10px;
+}
+
+.uploaded-photo,
+#video,
+#canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Button Container Styles */
+.button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* Search And Button Wrapper Styles */
+.search-and-buttons-wrapper {
+  display: flex;
+  justify-content: space-between; /* Pushes children to opposite ends */
+  align-items: flex-start; /* Aligns items at the top */
+  gap: 20px; /* Adds space between containers */
+  margin-bottom: 30px; /* Adjust as needed */
+}
+
+/* Column Selector Button */
+#columnSelectorBtn {
+  /* Base styling */
+  background-color: #ff6b35;
+  /* Vibrant orange that contrasts with green */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* Optional icon styling */
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Hover state */
+#columnSelectorBtn:hover {
+  background-color: #ff8c42;
+  /* Lighter orange */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Active/pressed state */
+#columnSelectorBtn:active {
+  transform: translateY(0);
+  background-color: #e55624;
+  /* Darker orange */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus state for accessibility */
+#columnSelectorBtn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.4);
+}
+
+/* Optional: Add a subtle shine effect */
+#columnSelectorBtn::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 50%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(30deg);
+  transition: all 0.3s;
+}
+
+#columnSelectorBtn:hover::after {
+  left: 120%;
+}
+
+/* Icon styling */
+#columnSelectorBtn::before {
+  content: "☰";
+  font-size: 18px;
+}
+
+/* Modal Styles */
+#columnSelectorModal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #f8f9fa;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 300px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.close-modal {
+  float: right;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: #000;
+}
+
+/* Column Checkboxes */
+.column-checkbox {
+  margin: 10px 0;
+}
+
+/* Ensure hidden columns stay hidden */
+th[style="display:none;"],
+td[style="display:none;"] {
+  display: none !important;
+}
+
+/* Hide the sidebar close button when the image modal is active */
+body.modal-open #horseDetailsSidebar .closebtn {
+  display: none;
+}
+
+/* Container */
+.responsive-table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  margin: 20px 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Table */
+.responsive-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 18px;
+  background-color: #fff;
+}
+
+/* Table Head */
+.responsive-table-container thead tr {
+  color: white;
+  text-align: left;
+}
+
+.responsive-table-container th {
+  padding: 14px 18px;
+  font-weight: 600;
+  border-bottom: 2px solid #ffffff;
+  white-space: nowrap;
+  background-color: #37474f;
+}
+
+/* Table Body */
+.responsive-table-container td {
+  padding: 12px 18px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+
+/* Row hover effect */
+.responsive-table-container tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Group wrapper for all fields */
+.field-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px; /* tighter spacing */
+  padding: 12px 0;
+}
+
+/* Individual row: one label + buttons */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 280px;
+  min-width: 260px;
+}
+
+/* Group wrapper for all fields */
+.field-group-vertical {
+  display: flex;
+  flex-direction: row; /* Ensure horizontal layout */
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 12px 0;
+}
+
+/* Group of buttons stays horizontal */
+.button-group.button-group-vertical {
+  display: flex;
+  flex-direction: row; /* Force buttons in a row */
+  flex-wrap: nowrap; /* Prevent wrapping to new line */
+  gap: 6px; /* Space between buttons */
+  align-items: center; /* Vertically center the buttons */
+}
+
+/* Each row contains a label and button group */
+.form-row-vertical label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 0 0 auto; /* Prevents stretching */
+  min-width: auto;
+}
+
+/* Label becomes a top header */
+.form-row label {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Button group wraps if needed */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Compact buttons */
+.btn-option {
+  padding: 4px 10px;
+  font-size: 13px;
+  line-height: 0.5;
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+  max-width: 60%; /* Prevents overflow in tight layouts */
+}
+
+.btn-option:hover {
+  background-color: #e6e6e6;
+}
+
+.btn-option.selected {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+  font-weight: 500;
+}
+
+.section-header {
+  background-color: black;
+  color: white;
+  padding: 10px;
+  margin: 20px 0;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/* General Container Styling */
+.search-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 700px;
+  margin: 20px auto;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Form Layout */
+.form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Search Inputs */
+.search-box {
+  flex: 1 1 200px;
+  padding: 10px 12px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.search-box:focus {
+  border-color: #f97316; /* Orange focus */
+  outline: none;
+}
+
+/* Search Button */
+.search-button {
+  background-color: #f97316; /* Bright orange */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search-button:hover {
+  background-color: #ea580c; /* Darker orange */
+}
+
+/* Clear Button */
+.clear-button {
+  background-color: #10b981; /* Vibrant green */
+  color: white;
+  padding: 10px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.clear-button:hover {
+  background-color: #059669; /* Darker green */
+}
+
+.detail-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 5px;
+}
+
+.detail-section h4 {
+  margin-top: 0;
+  color: #229954;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.horse-info {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  align-items: center;
+}
+
+.horse-details-title {
+  display: flex;
+  justify-content: center;
+  /* Horizontally center */
+  align-items: center;
+  /* Vertically center */
+  font-size: 14px;
+  margin-top: 5px;
+  color: white;
+}
+
+/* Sticky section that includes both horse name and details */
+.horse-title-section {
+  position: sticky;
+  top: 90;
+  /* Stick to the top of the viewport */
+  z-index: 100;
+  /* Ensure it stays above other content */
+  background-color: #229954;
+  /* Green background */
+  padding: 10px;
+  /* Optional padding */
+  border-radius: 5px;
+  /* Optional rounded corners */
+  width: 100%;
+  /* Ensure it takes full width */
+}
+
+.parent-info .horse-info:not(:last-child):after {
+  content: ", ";
+}
+
+.parent-info {
+  display: inline;
+  font-size: 2em;
+  /* Makes parentheses bigger */
+  color: white;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.parent-info:before {
+  content: "(";
+}
+
+.parent-info:after {
+  content: ")";
+}
+
+.edit-field {
+  display: none;
+  width: 80%;
+  padding: 5px;
+  margin: 3px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* When in edit mode */
+.edit-mode .edit-field {
+  display: inline-block;
+}
+
+.edit-mode [id$="Display"] {
+  display: none;
+}
+
+/* Responsive adjustments for tablets */
+@media screen and (min-width: 350px) and (max-width: 1500px) {
+  /* Sidebar for smaller screens */
+  .sidebar {
+    width: 100%;
+    right: -100%;
+  }
+
+  .sidebar.open {
+    right: 0;
+  }
+
+  /* Adjust h2 size */
+  .sidebar h2 {
+    font-size: 20px;
+  }
+
+  /* Uploaded photo size */
+  .uploaded-photo {
+    width: 80px;
+  }
+
+  /* Adjust delete photo size */
+  .delete-photo {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+
+  #horseDetailsSidebar {
+    width: 100%;
+    max-width: none;
+    right: -100%;
+  }
+
+  #horseDetailsSidebar.open {
+    width: 100vw;
+  }
+
+  body {
+    overflow: hidden;
+    /* Prevent background scrolling when sidebar is open */
+  }
+
+  #imageModal .modal-content {
+    max-width: 90%;
+    /* Full screen width on small devices */
+    max-height: 90%;
+    /* Allow more height for small screens */
+  }
+
+  .responsive-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  body,
+  html {
+    overflow-x: hidden;
+  }
+
+  table {
+    min-width: 600px; /* Or whatever makes sense based on your columns */
+  }
+
+  .search-and-buttons-wrapper {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center buttons horizontally */
+    gap: 10px;
+    padding: 0 15px; /* Add side padding */
+    width: 100%; /* Full width */
+  }
+
+  .horse-header {
+    font-size: x-large;
+  }
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.horse-link {
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.horse-link:hover {
+  color: #004499;
+}
+
+/* ============================================
+   ADDITIONS FOR CLICK-TO-EDIT FUNCTIONALITY - HORSE INFO SECTION ONLY
+   ============================================ */
+
+/* Editable Field Styling - Only applies to .editable-field within form-row */
+.form-row .editable-field {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  min-width: 50px;
+  background: #f9fafb;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.form-row .editable-field:hover {
+  background-color: #fef3c7 !important;
+  border-color: #f59e0b;
+}
+
+.form-row .editable-field[contenteditable="true"]:focus {
+  background-color: #fffbeb !important;
+  outline: 2px solid #f59e0b;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Read-only field (Dam) - ONLY affects Dam field */
+.form-row span[data-field="DAM"] {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+/* Visual feedback for saving */
+.form-row .editable-field.saving {
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.form-row .editable-field.success {
+  background-color: #d1fae5 !important;
+  border-color: #10b981 !important;
+  transition: background 0.3s;
+}
+
+.form-row .editable-field.error {
+  background-color: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  transition: background 0.3s;
+}
+
+/* Style for the action bar message */
+.sticky-action-bar small {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  background: #f9fafb;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.sticky-action-bar small i {
+  margin-right: 5px;
+  color: #f59e0b;
+}
+
+/* Hide the edit/save/cancel buttons since we're using click-to-edit */
+#editBtn,
+#saveBtn,
+#cancelBtn {
+  display: none !important;
+}
+
+@media print {
+  /* Hide all interactive elements when printing */
+  .search-container,
+  .button-container,
+  #columnSelectorBtn,
+  #columnCheckboxes,
+  .custom-select1,
+  input[type="submit"],
+  input[type="text"],
+  select,
+  button,
+  form,
+  #printButton,
+  input[name="SUBMITBUTTON"],
+  select[id^="sort"],
+  select[id$="_order"],
+  .search-button,
+  .clear-button {
+    display: none !important;
+  }
+}
+
+#printButton {
+  position: absolute;
+  right: 30px; /* Position on the right */
+  padding: 16px 28px; /* Increased padding for a larger, more clickable button */
+  background-color: white; /* Blue background color */
+  color: white; /* White text color */
+  border: 2px solid black; /* Black border all around */
+  border-radius: 10px; /* Rounded corners */
+  font-size: 24px; /* Slightly larger font */
+  font-weight: bold; /* Bold text for emphasis */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow effect */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: opacity 0.3s ease; /* Smooth transition for hiding/showing */
+}
+
+/* ============================================
+   END OF ADDITIONS
+   ============================================ */

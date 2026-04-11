@@ -1,0 +1,6 @@
+AddHandler perl-script .pl
+AddHandler cgi-script .cgi .pl
+<IfModule mod_headers.c>
+Header set Cache-Control "max-age=0,no-store"
+</IfModule>
+AddHandler application/x-httpd-php83 .php .php5 .php4 .php3

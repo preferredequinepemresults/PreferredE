@@ -1,0 +1,149 @@
+[11-Jun-2021 20:22:11 UTC] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function fetchSireData(), 7 passed in /home/customer/www/preferredequineresults.com/public_html/PreferredE/sire_analysis.php on line 169 and exactly 8 expected in /home/customer/www/preferredequineresults.com/public_html/PreferredE/functions.php:180
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/sire_analysis.php(169): fetchSireData('ANDOVERSURE', '', '', '', '', '', '')
+#1 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/functions.php on line 180
+[16-Jul-2021 20:25:23 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[16-Jul-2021 20:25:23 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:29:35 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:29:35 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:33:22 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:33:22 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:33:22 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:33:22 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:34:46 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:34:46 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:34:51 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:34:51 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:53:35 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 16:53:35 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 19:43:21 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 19:43:21 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 21:32:42 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[21-Jul-2021 21:32:42 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:03:55 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:03:55 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:03:55 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:03:55 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:04:20 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:04:20 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:04:24 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:04:24 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:13:21 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:13:21 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:13:22 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:13:22 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:12 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:12 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:13 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:13 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:14 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:14 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:26 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:26 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:31 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:17:31 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:19:46 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:19:46 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:21:36 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:21:36 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:23:43 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:23:43 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:23:43 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:23:43 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:25:48 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:25:48 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:25:51 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:25:51 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:28:37 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:28:37 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:31:48 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:31:48 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:32:02 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:32:02 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:33:29 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:33:29 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:36:31 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:36:31 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:43:06 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[22-Jul-2021 19:43:06 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 59
+[23-Jul-2021 13:01:41 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 60
+[23-Jul-2021 13:01:41 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 60
+[23-Jul-2021 13:01:42 UTC] PHP Fatal error:  Uncaught Error: Call to a member function execute() on bool in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:111
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(364): Phppot\DataSource->insert('INSERT into sal...', 'ssssssssdssssss...', Array)
+#1 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 111
+[23-Jul-2021 13:01:42 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 60
+[23-Jul-2021 13:01:42 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 60
+[27-Jul-2021 14:14:45 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 60
+[27-Jul-2021 14:14:45 UTC] PHP Notice:  Problem with connecting to database. in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 60
+[27-Jul-2021 14:14:46 UTC] PHP Fatal error:  Uncaught Error: Call to a member function execute() on bool in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:111
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(364): Phppot\DataSource->insert('INSERT into sal...', 'ssssssssdssssss...', Array)
+#1 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 111
+[27-Jul-2021 14:19:10 UTC] PHP Fatal error:  Uncaught Error: Call to a member function execute() on bool in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:111
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(132): Phppot\DataSource->insert('INSERT into dam...', 'sssssssssis', Array)
+#1 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 111
+[27-Jul-2021 14:20:29 UTC] PHP Fatal error:  Uncaught Error: Call to a member function execute() on bool in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:111
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(132): Phppot\DataSource->insert('INSERT into dam...', 'sssssssssis', Array)
+#1 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 111
+[27-Jul-2021 14:20:59 UTC] PHP Fatal error:  Uncaught Error: Call to a member function execute() on bool in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:111
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(132): Phppot\DataSource->insert('INSERT into dam...', 'sssssssssis', Array)
+#1 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 111
+[27-Jul-2021 15:03:35 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'DAMTATT' in 'field list' in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:108
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(108): mysqli->prepare('INSERT into dam...')
+#1 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(132): Phppot\DataSource->insert('INSERT into dam...', 'sssssssssis', Array)
+#2 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 108
+[27-Jul-2021 15:22:42 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'URL' in 'field list' in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:108
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(108): mysqli->prepare('INSERT into sal...')
+#1 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(364): Phppot\DataSource->insert('INSERT into sal...', 'ssssssssdssssss...', Array)
+#2 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 108
+[30-Jul-2021 17:47:26 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: NO) in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:57
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(57): mysqli->__construct('localhost', 'root', '', 'horses')
+#1 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(45): Phppot\DataSource->getConnection()
+#2 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv_tb.php(24): Phppot\DataSource->__construct()
+#3 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 57
+[30-Jul-2021 17:49:21 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: NO) in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:57
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(57): mysqli->__construct('localhost', 'root', '', 'horses')
+#1 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(45): Phppot\DataSource->getConnection()
+#2 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv_tb.php(24): Phppot\DataSource->__construct()
+#3 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 57
+[04-Oct-2021 14:17:40 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'NFFM' in 'field list' in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:108
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(108): mysqli->prepare('INSERT into sal...')
+#1 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(412): Phppot\DataSource->insert('INSERT into sal...', 'ssssssssdssssss...', Array)
+#2 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 108
+[04-Oct-2021 14:19:27 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'NFFM' in 'field list' in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:108
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(108): mysqli->prepare('INSERT into sal...')
+#1 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(412): Phppot\DataSource->insert('INSERT into sal...', 'ssssssssdssssss...', Array)
+#2 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 108
+[04-Oct-2021 14:23:37 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'NFFM' in 'field list' in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php:108
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php(108): mysqli->prepare('INSERT into sal...')
+#1 /home/customer/www/preferredequineresults.com/public_html/PreferredE/import_csv.php(412): Phppot\DataSource->insert('INSERT into sal...', 'ssssssssdssssss...', Array)
+#2 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/DataSource.php on line 108
+[27-Apr-2023 17:13:02 UTC] PHP Fatal error:  Uncaught Error: Call to a member function fetch_assoc() on bool in /home/customer/www/preferredequineresults.com/public_html/PreferredE/functions.php:223
+Stack trace:
+#0 /home/customer/www/preferredequineresults.com/public_html/PreferredE/process_dam_search.php(19): getDamname('SIX PACK\\')
+#1 {main}
+  thrown in /home/customer/www/preferredequineresults.com/public_html/PreferredE/functions.php on line 223

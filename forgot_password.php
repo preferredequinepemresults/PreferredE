@@ -3,21 +3,95 @@ session_start();
 include("./header.php");
 
 require_once("config.php");
-require_once("cognito.php");
 require_once("db-settings.php");
+require_once("auth.php");
 
 $message = '';
 $message_type = ''; // success, error, info
 $show_reset_form = false;
 $email = '';
 
-// Handle form submissions
+function send_password_reset_code($email, $reset_code)
+{
+    $host = $_SERVER['HTTP_HOST'] ?? 'preferredequine.com';
+    $to = $email;
+    $subject = "Password Reset Code";
+
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers .= "From: noreply@" . $host . "\r\n";
+    $headers .= "Reply-To: support@" . $host . "\r\n";
+
+    $safe_code = htmlspecialchars($reset_code, ENT_QUOTES, 'UTF-8');
+    $year = date('Y');
+
+    $email_body = "
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #2E4053; color: white; padding: 20px; text-align: center; }
+            .content { padding: 30px; background: #f9f9f9; }
+            .code {
+                font-size: 32px;
+                font-weight: bold;
+                color: #2E4053;
+                text-align: center;
+                padding: 20px;
+                background: white;
+                border-radius: 5px;
+                margin: 20px 0;
+                letter-spacing: 5px;
+            }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <div class='header'>
+                <h2>Password Reset Request</h2>
+            </div>
+            <div class='content'>
+                <p>Hello,</p>
+                <p>We received a request to reset your password. Use the code below to complete your password reset:</p>
+                <div class='code'>{$safe_code}</div>
+                <p>This code will expire in <strong>1 hour</strong>.</p>
+                <p>If you did not request this password reset, please ignore this email or contact support.</p>
+            </div>
+            <div class='footer'>
+                <p>&copy; {$year} Preferred Equine. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>";
+
+    return mail($to, $subject, $email_body, $headers);
+}
+
+function create_password_reset_code($mysqli, $email)
+{
+    $reset_code = sprintf("%06d", random_int(0, 999999));
+    $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+    $update_code = $mysqli->prepare("UPDATE users SET reset_code = ?, reset_code_expiry = ? WHERE EMAIL = ?");
+    $update_code->bind_param("sss", $reset_code, $expiry, $email);
+    $success = $update_code->execute();
+    $affected_rows = $update_code->affected_rows;
+    $update_code->close();
+
+    if (!$success || $affected_rows === 0) {
+        return false;
+    }
+
+    return $reset_code;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    // STEP 1: Send reset code
     if (isset($_POST['send_code'])) {
         $email = trim($_POST['email']);
-        
+
         if (empty($email)) {
             $message = "Please enter your email address";
             $message_type = "error";
@@ -25,166 +99,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Please enter a valid email address";
             $message_type = "error";
         } else {
-            try {
-                // Check if user exists in database
-                $user_check = $mysqli->prepare("SELECT * FROM users WHERE EMAIL = ?");
-                $user_check->bind_param("s", $email);
-                $user_check->execute();
-                $user_result = $user_check->get_result();
-                
-                if ($user_result->num_rows === 0) {
-                    $message = "No account found with this email address";
-                    $message_type = "error";
+            $user_check = $mysqli->prepare("SELECT EMAIL FROM users WHERE EMAIL = ? AND ACTIVE = 'Y' LIMIT 1");
+            $user_check->bind_param("s", $email);
+            $user_check->execute();
+            $user_result = $user_check->get_result();
+            $user_exists = $user_result->num_rows > 0;
+            $user_check->close();
+
+            if ($user_exists) {
+                $reset_code = create_password_reset_code($mysqli, $email);
+
+                if ($reset_code && send_password_reset_code($email, $reset_code)) {
+                    $_SESSION['reset_email'] = $email;
+                    $message = "Reset code sent to your email. Please check your inbox.";
+                    $message_type = "success";
+                    $show_reset_form = true;
                 } else {
-                    $user_data = $user_result->fetch_assoc();
-                    
-                    // Check if user is verified in Cognito
-                    if ($user_data['cognito_verified'] == 0) {
-                        $message = "Your email is not verified. Please verify your email first before resetting your password.";
-                        $message_type = "error";
-                        
-                        // Store email in session for verification redirect
-                        $_SESSION['verify_email'] = $email;
-                        
-                        // Add verification link
-                        echo '<script>
-                            setTimeout(function() {
-                                if(confirm("Your email is not verified. Would you like to go to the verification page?")) {
-                                    window.location.href = "verify.php";
-                                }
-                            }, 100);
-                        </script>';
-                    } else {
-                        // User is verified, proceed with password reset
-                        
-                        // Try Cognito first - IAM role provides credentials automatically
-                        require_once 'vendor/autoload.php';
-                        
-                        // Client uses IAM role from EC2 instance
-                        $client = new Aws\CognitoIdentityProvider\CognitoIdentityProviderClient([
-                            'region' => COGNITO_REGION,
-                            'version' => 'latest'
-                        ]);
-                        
-                        try {
-                            // Attempt to send reset code via Cognito
-                            $client->forgotPassword([
-                                'ClientId' => COGNITO_APP_CLIENT_ID,
-                                'Username' => $email
-                            ]);
-                            
-                            $_SESSION['reset_email'] = $email;
-                            $_SESSION['reset_method'] = 'cognito';
-                            $message = "Reset code sent to your email! Please check your inbox.";
-                            $message_type = "success";
-                            $show_reset_form = true;
-                            
-                        } catch (Exception $cognitoError) {
-                            $errorMessage = $cognitoError->getMessage();
-                            error_log("Cognito forgotPassword error: " . $errorMessage);
-                            
-                            // FALLBACK: Manual reset via database
-                            
-                            // Generate 6-digit reset code
-                            $reset_code = sprintf("%06d", mt_rand(1, 999999));
-                            
-                            // Set expiry (1 hour from now)
-                            $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
-                            
-                            // Store reset code in database
-                            $update_code = $mysqli->prepare("UPDATE users SET reset_code = ?, reset_code_expiry = ? WHERE EMAIL = ?");
-                            $update_code->bind_param("sss", $reset_code, $expiry, $email);
-                            
-                            if ($update_code->execute()) {
-                                // Send email with reset code
-                                $to = $email;
-                                $subject = "Password Reset Code";
-                                
-                                $headers = "MIME-Version: 1.0" . "\r\n";
-                                $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-                                $headers .= "From: noreply@" . $_SERVER['HTTP_HOST'] . "\r\n";
-                                $headers .= "Reply-To: support@" . $_SERVER['HTTP_HOST'] . "\r\n";
-                                
-                                $email_body = "
-                                <!DOCTYPE html>
-                                <html>
-                                <head>
-                                    <style>
-                                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                                        .header { background: #2E4053; color: white; padding: 20px; text-align: center; }
-                                        .content { padding: 30px; background: #f9f9f9; }
-                                        .code { 
-                                            font-size: 32px; 
-                                            font-weight: bold; 
-                                            color: #2E4053; 
-                                            text-align: center; 
-                                            padding: 20px; 
-                                            background: white; 
-                                            border-radius: 5px;
-                                            margin: 20px 0;
-                                            letter-spacing: 5px;
-                                        }
-                                        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-                                    </style>
-                                </head>
-                                <body>
-                                    <div class='container'>
-                                        <div class='header'>
-                                            <h2>Password Reset Request</h2>
-                                        </div>
-                                        <div class='content'>
-                                            <p>Hello,</p>
-                                            <p>We received a request to reset your password. Use the code below to complete your password reset:</p>
-                                            <div class='code'>{$reset_code}</div>
-                                            <p>This code will expire in <strong>1 hour</strong>.</p>
-                                            <p>If you didn't request this password reset, please ignore this email or contact support.</p>
-                                        </div>
-                                        <div class='footer'>
-                                            <p>&copy; " . date('Y') . " Preferred Equine. All rights reserved.</p>
-                                        </div>
-                                    </div>
-                                </body>
-                                </html>";
-                                
-                                if (mail($to, $subject, $email_body, $headers)) {
-                                    $_SESSION['reset_email'] = $email;
-                                    $_SESSION['reset_method'] = 'manual';
-                                    
-                                    $message = "Reset code sent to your email! Please check your inbox.";
-                                    $message_type = "success";
-                                    $show_reset_form = true;
-                                } else {
-                                    $message = "Failed to send reset code email. Please try again.";
-                                    $message_type = "error";
-                                }
-                            } else {
-                                $message = "System error. Please try again later.";
-                                $message_type = "error";
-                            }
-                        }
-                    }
+                    $message = "Failed to send reset code. Please try again.";
+                    $message_type = "error";
                 }
-                
-            } catch (Exception $e) {
-                $message = "System Error: " . $e->getMessage();
-                $message_type = "error";
-                error_log("Password reset error: " . $e->getMessage());
+            } else {
+                $message = "If an active account exists for that email, a reset code will be sent.";
+                $message_type = "success";
             }
         }
     }
-    
-    // STEP 2: Reset password with code
+
     if (isset($_POST['reset_password'])) {
         $email = $_SESSION['reset_email'] ?? '';
         $code = trim($_POST['code']);
-        $new_password = $_POST['new_password'];
-        $confirm_password = $_POST['confirm_password'];
-        $reset_method = $_SESSION['reset_method'] ?? 'cognito';
-        
+        $new_password = $_POST['new_password'] ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
+
         $errors = [];
-        
-        // Validation
+
         if (empty($email)) {
             $errors[] = "Email session expired. Please start over.";
         }
@@ -197,8 +145,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($new_password !== $confirm_password) {
             $errors[] = "Passwords do not match";
         }
-        
-        // Password strength validation
         if (strlen($new_password) < 8) {
             $errors[] = "Password must be at least 8 characters";
         }
@@ -211,137 +157,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!preg_match('/[0-9]/', $new_password)) {
             $errors[] = "Password must contain at least one number";
         }
-        
+
         if (empty($errors)) {
             try {
-                
-                if ($reset_method === 'manual') {
-                    // MANUAL RESET: Verify code from database
-                    
-                    // Check if code exists and not expired
-                    $verify_stmt = $mysqli->prepare("SELECT * FROM users WHERE EMAIL = ? AND reset_code = ? AND reset_code_expiry > NOW()");
-                    $verify_stmt->bind_param("ss", $email, $code);
-                    $verify_stmt->execute();
-                    $verify_result = $verify_stmt->get_result();
-                    
-                    if ($verify_result->num_rows > 0) {
-                        // Code is valid - update password in database
-                        $update_stmt = $mysqli->prepare("UPDATE users SET PASSWORD = ?, reset_code = NULL, reset_code_expiry = NULL WHERE EMAIL = ?");
-                        $update_stmt->bind_param("ss", $new_password, $email);
-                        
-                        if ($update_stmt->execute()) {
-                            
-                            // Also try to update in Cognito using IAM role
-                            try {
-                                require_once 'vendor/autoload.php';
-                                
-                                // Use IAM role from EC2
-                                $client = new Aws\CognitoIdentityProvider\CognitoIdentityProviderClient([
-                                    'region' => COGNITO_REGION,
-                                    'version' => 'latest'
-                                ]);
-                                
-                                // Admin set password in Cognito
-                                $client->adminSetUserPassword([
-                                    'UserPoolId' => COGNITO_USER_POOL_ID,
-                                    'Username' => $email,
-                                    'Password' => $new_password,
-                                    'Permanent' => true
-                                ]);
-                                
-                                // Mark as verified in Cognito
-                                $client->adminUpdateUserAttributes([
-                                    'UserPoolId' => COGNITO_USER_POOL_ID,
-                                    'Username' => $email,
-                                    'UserAttributes' => [
-                                        [
-                                            'Name' => 'email_verified',
-                                            'Value' => 'true'
-                                        ]
-                                    ]
-                                ]);
-                                
-                                // Update database cognito_verified flag
-                                $update_verified = $mysqli->prepare("UPDATE users SET cognito_verified = 1 WHERE EMAIL = ?");
-                                $update_verified->bind_param("s", $email);
-                                $update_verified->execute();
-                                
-                            } catch (Exception $cogError) {
-                                // Log Cognito error but don't fail the reset
-                                error_log("Cognito update failed for user {$email}: " . $cogError->getMessage());
-                            }
-                            
-                            // Clear session
-                            unset($_SESSION['reset_email']);
-                            unset($_SESSION['reset_method']);
-                            
-                            $message = "Password reset successfully! You can now login with your new password.";
-                            $message_type = "success";
-                            $show_reset_form = false;
-                            
-                            // Redirect to login after 3 seconds
-                            echo '<script>
-                                setTimeout(function() {
-                                    window.location.href = "login.php";
-                                }, 3000);
-                            </script>';
-                            
-                        } else {
-                            $message = "Failed to update password. Please try again.";
-                            $message_type = "error";
-                            $show_reset_form = true;
-                        }
-                        
+                $verify_stmt = $mysqli->prepare("SELECT USER_ID FROM users WHERE EMAIL = ? AND reset_code = ? AND reset_code_expiry > NOW() LIMIT 1");
+                $verify_stmt->bind_param("ss", $email, $code);
+                $verify_stmt->execute();
+                $verify_result = $verify_stmt->get_result();
+                $user = $verify_result->fetch_assoc();
+                $verify_stmt->close();
+
+                if ($user) {
+                    $hashed_password = auth_hash_password($new_password);
+                    $update_stmt = $mysqli->prepare("UPDATE users SET PASSWORD = ?, reset_code = NULL, reset_code_expiry = NULL WHERE USER_ID = ?");
+                    $update_stmt->bind_param("si", $hashed_password, $user['USER_ID']);
+
+                    if ($update_stmt->execute()) {
+                        unset($_SESSION['reset_email']);
+
+                        $message = "Password reset successfully. You can now login with your new password.";
+                        $message_type = "success";
+                        $show_reset_form = false;
+
+                        echo '<script>
+                            setTimeout(function() {
+                                window.location.href = "login.php";
+                            }, 3000);
+                        </script>';
                     } else {
-                        $message = "Invalid or expired reset code. Please request a new code.";
+                        $message = "Failed to update password. Please try again.";
                         $message_type = "error";
                         $show_reset_form = true;
                     }
-                    
+
+                    $update_stmt->close();
                 } else {
-                    // COGNITO RESET: Use Cognito's confirmForgotPassword
-                    require_once 'vendor/autoload.php';
-                    
-                    // Use IAM role from EC2
-                    $client = new Aws\CognitoIdentityProvider\CognitoIdentityProviderClient([
-                        'region' => COGNITO_REGION,
-                        'version' => 'latest'
-                    ]);
-                    
-                    // Confirm password reset in Cognito
-                    $client->confirmForgotPassword([
-                        'ClientId' => COGNITO_APP_CLIENT_ID,
-                        'Username' => $email,
-                        'ConfirmationCode' => $code,
-                        'Password' => $new_password
-                    ]);
-                    
-                    // Update password in database
-                    $update_stmt = $mysqli->prepare("UPDATE users SET PASSWORD = ? WHERE EMAIL = ?");
-                    $update_stmt->bind_param("ss", $new_password, $email);
-                    $update_stmt->execute();
-                    
-                    // Ensure cognito_verified is set to 1
-                    $update_verified = $mysqli->prepare("UPDATE users SET cognito_verified = 1 WHERE EMAIL = ?");
-                    $update_verified->bind_param("s", $email);
-                    $update_verified->execute();
-                    
-                    // Clear session
-                    unset($_SESSION['reset_email']);
-                    unset($_SESSION['reset_method']);
-                    
-                    $message = "Password reset successfully! You can now login with your new password.";
-                    $message_type = "success";
-                    $show_reset_form = false;
-                    
-                    // Redirect to login after 3 seconds
-                    echo '<script>
-                        setTimeout(function() {
-                            window.location.href = "login.php";
-                        }, 3000);
-                    </script>';
+                    $message = "Invalid or expired reset code. Please request a new code.";
+                    $message_type = "error";
+                    $show_reset_form = true;
                 }
-                
             } catch (Exception $e) {
                 $message = "Error: " . $e->getMessage();
                 $message_type = "error";
@@ -356,75 +210,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get email from session if available
 if (!$email && isset($_SESSION['reset_email'])) {
     $email = $_SESSION['reset_email'];
     $show_reset_form = true;
 }
 
-// Resend code handler
 if (isset($_GET['resend']) && $_GET['resend'] == 1 && isset($_SESSION['reset_email'])) {
     $email = $_SESSION['reset_email'];
-    $reset_method = $_SESSION['reset_method'] ?? 'manual';
-    
-    if ($reset_method === 'manual') {
-        // Generate new code
-        $reset_code = sprintf("%06d", mt_rand(1, 999999));
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
-        
-        $update_code = $mysqli->prepare("UPDATE users SET reset_code = ?, reset_code_expiry = ? WHERE EMAIL = ?");
-        $update_code->bind_param("sss", $reset_code, $expiry, $email);
-        
-        if ($update_code->execute()) {
-            // Send email
-            $to = $email;
-            $subject = "New Password Reset Code";
-            $headers = "MIME-Version: 1.0" . "\r\n";
-            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-            $headers .= "From: noreply@" . $_SERVER['HTTP_HOST'] . "\r\n";
-            
-            $email_body = "
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { background: #2E4053; color: white; padding: 20px; text-align: center; }
-                    .content { padding: 30px; background: #f9f9f9; }
-                    .code { 
-                        font-size: 32px; 
-                        font-weight: bold; 
-                        color: #2E4053; 
-                        text-align: center; 
-                        padding: 20px; 
-                        background: white; 
-                        border-radius: 5px;
-                        margin: 20px 0;
-                        letter-spacing: 5px;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class='container'>
-                    <div class='header'>
-                        <h2>New Password Reset Code</h2>
-                    </div>
-                    <div class='content'>
-                        <p>Hello,</p>
-                        <p>Here is your new password reset code:</p>
-                        <div class='code'>{$reset_code}</div>
-                        <p>This code will expire in <strong>1 hour</strong>.</p>
-                    </div>
-                </div>
-            </body>
-            </html>";
-            
-            mail($to, $subject, $email_body, $headers);
-            
-            $message = "New reset code sent to your email!";
-            $message_type = "success";
-        }
+    $reset_code = create_password_reset_code($mysqli, $email);
+
+    if ($reset_code && send_password_reset_code($email, $reset_code)) {
+        $message = "New reset code sent to your email.";
+        $message_type = "success";
+        $show_reset_form = true;
+    } else {
+        $message = "Failed to send a new reset code. Please try again.";
+        $message_type = "error";
+        $show_reset_form = true;
     }
 }
 ?>
@@ -762,11 +564,6 @@ if (isset($_GET['resend']) && $_GET['resend'] == 1 && isset($_SESSION['reset_ema
         <div class="form-group">
             <label>Email Address</label>
             <input type="text" class="form-control" value="<?php echo htmlspecialchars($email); ?>" readonly>
-            <?php if (isset($_SESSION['reset_method']) && $_SESSION['reset_method'] === 'manual'): ?>
-                <small style="color: #e67e22; font-size: 13px; display: block; margin-top: 5px;">
-                    <i class="fa fa-info-circle"></i> Using manual reset (Cognito temporarily unavailable)
-                </small>
-            <?php endif; ?>
         </div>
         
         <div class="form-group">

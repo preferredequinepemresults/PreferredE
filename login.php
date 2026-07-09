@@ -7,8 +7,8 @@ ini_set('display_errors', 1);
 include("./header.php");
 
 require_once("config.php");
-require_once("cognito.php");
 require_once("db-settings.php");
+require_once("auth.php");
 
 // If user is already logged in, redirect
 if (isset($_SESSION['UserName'])) {
@@ -20,10 +20,12 @@ if (isset($_SESSION['UserName'])) {
 // Handle form submission
 $errors = [];
 $form_data = $_POST ?? [];
+$success_message = $_SESSION['registration_success'] ?? '';
+unset($_SESSION['registration_success']);
 
 if (!empty($_POST)) {
     $username = trim($_POST["username"]);
-    $password = trim($_POST["password"]);
+    $password = $_POST["password"] ?? '';
 
     // Basic validation
     if (empty($username)) {
@@ -34,54 +36,51 @@ if (!empty($_POST)) {
     }
 
     if (count($errors) == 0) {
-        
-        // Authenticate with Cognito
-        $authResult = CognitoAuth::authenticate($username, $password);
-
-        if ($authResult['success']) {
-
-            // Get COMPLETE user data including ACTIVE status
-            $stmt = $mysqli->prepare("SELECT * FROM users WHERE EMAIL = ? OR USERNAME = ?");
+        if (auth_login_is_rate_limited($mysqli, $username)) {
+            $errors[] = "Too many failed login attempts. Please wait 15 minutes and try again.";
+            auth_record_login_attempt($mysqli, $username, false, 'rate_limited');
+        } else {
+            $stmt = $mysqli->prepare("SELECT * FROM users WHERE EMAIL = ? OR USERNAME = ? LIMIT 1");
             $stmt->bind_param("ss", $username, $username);
             $stmt->execute();
             $result = $stmt->get_result();
             $user_data = $result->fetch_assoc();
             $stmt->close();
 
-            // Check if user exists in database
-            if (!$user_data) {
-                $errors[] = "User account not found in database";
-            } 
-            // Check if user is ACTIVE (authorized)
-            elseif (!isset($user_data['ACTIVE']) || $user_data['ACTIVE'] != 'Y') {
-                // Redirect to inactive account page
+            $needs_rehash = false;
+            $password_valid = $user_data
+                ? auth_verify_password($password, $user_data['PASSWORD'] ?? '', $needs_rehash)
+                : false;
+
+            if (!$user_data || !$password_valid) {
+                $errors[] = "Invalid username or password";
+                auth_record_login_attempt($mysqli, $username, false, 'invalid_credentials');
+            } elseif (!isset($user_data['ACTIVE']) || $user_data['ACTIVE'] != 'Y') {
+                auth_record_login_attempt($mysqli, $username, false, 'inactive');
                 header("Location: inactive_account.php");
                 exit();
-            }
-            // Check if user is verified in Cognito
-            elseif (!isset($user_data['cognito_verified']) || $user_data['cognito_verified'] == 0) {
-                $_SESSION['verify_email'] = $username;
-                header("Location: verify.php");
-                exit();
-            }
-            // All checks passed - log the user in
-            else {
-                // Set session variables
+            } else {
+                if ($needs_rehash && isset($user_data['USER_ID'])) {
+                    auth_upgrade_password_hash($mysqli, (int)$user_data['USER_ID'], $password);
+                }
+
+                session_regenerate_id(true);
+
                 $_SESSION["UserActive"] = 'Y';
-                $_SESSION["UserName"] = $username;
-                $_SESSION["UserEmail"] = $username;
+                $_SESSION["UserName"] = $user_data['EMAIL'] ?: $username;
+                $_SESSION["UserEmail"] = $user_data['EMAIL'] ?: $username;
                 $_SESSION["UserRole"] = $user_data['USERROLE'] ?? 'user';
                 $_SESSION["UserFirstName"] = $user_data['FNAME'] ?? '';
                 $_SESSION["UserLastName"] = $user_data['LNAME'] ?? '';
+                $_SESSION['LAST_ACTIVITY'] = time();
 
-                setcookie("LoggedInUser", $username, time() + 3600, "/");
+                setcookie("LoggedInUser", $_SESSION["UserEmail"], time() + 3600, "/", "", !empty($_SERVER['HTTPS']), true);
+                auth_record_login_attempt($mysqli, $username, true, 'success');
 
                 $redirect_url = isset($_GET['redirect']) ? urldecode($_GET['redirect']) : "index.php";
                 header("Location: $redirect_url");
                 exit();
             }
-        } else {
-            $errors[] = $authResult['error'] ?? 'Invalid username or password';
         }
     }
 }
@@ -193,6 +192,17 @@ ob_end_flush();
         font-weight: 500;
     }
 
+    .success-alert {
+        background-color: #f0fff4;
+        border: 1px solid #c6f6d5;
+        color: #276749;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+        text-align: center;
+        font-weight: 500;
+    }
+
     .submit-btn {
         width: 100%;
         padding: 14px;
@@ -291,6 +301,12 @@ ob_end_flush();
     <?php if (!empty($errors)): ?>
         <div class="error-alert">
             <?php echo htmlspecialchars($errors[0]); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($success_message)): ?>
+        <div class="success-alert">
+            <?php echo htmlspecialchars($success_message); ?>
         </div>
     <?php endif; ?>
 

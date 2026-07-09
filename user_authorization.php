@@ -3,7 +3,6 @@ include("./header.php");
 include("./session_page.php");
 require_once("config.php");
 require_once("db-settings.php");
-require_once("cognito.php");
 
 // Handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -28,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Handle Delete User (from both database and Cognito)
+    // Handle Delete User
     if (isset($_POST['USER_ID_DELETE']) && !empty($_POST['USER_ID_DELETE'])) {
         $user_id = $_POST['USER_ID_DELETE'];
         $user_email = $_POST['USER_EMAIL'] ?? '';
@@ -510,7 +509,7 @@ $resultFound = getUserData();
         }
 
         function confirmDelete(userId, email) {
-            return confirm(`⚠️ WARNING: Are you sure you want to PERMANENTLY DELETE user ${userId} (${email})?\n\nThis will delete the user from BOTH the database AND Cognito. This action CANNOT be undone!`);
+            return confirm(`WARNING: Are you sure you want to PERMANENTLY DELETE user ${userId} (${email})?\n\nThis will delete the user from the database. This action CANNOT be undone!`);
         }
 
         // Show toast notification
@@ -544,7 +543,7 @@ $resultFound = getUserData();
 </body>
 
 <?php
-// Function to completely delete user from both database and Cognito
+// Function to completely delete user from the database
 function deleteUserCompletely($user_id, $user_email) {
     global $mysqli;
     
@@ -552,7 +551,6 @@ function deleteUserCompletely($user_id, $user_email) {
     $mysqli->begin_transaction();
     
     try {
-        // First, get user details if email not provided
         if (empty($user_email)) {
             $stmt = $mysqli->prepare("SELECT EMAIL FROM users WHERE USER_ID = ?");
             $stmt->bind_param("s", $user_id);
@@ -562,42 +560,7 @@ function deleteUserCompletely($user_id, $user_email) {
             $user_email = $user['EMAIL'] ?? '';
             $stmt->close();
         }
-        
-        // 1. Delete from Cognito if configured
-        $cognito_message = "";
-        
-        if (!empty($user_email) && defined('COGNITO_REGION') && defined('COGNITO_USER_POOL_ID') && 
-            COGNITO_REGION !== 'us-east-1' && COGNITO_USER_POOL_ID !== 'your-user-pool-id') {
-            try {
-                require_once 'vendor/autoload.php';
-                
-                $client = new Aws\CognitoIdentityProvider\CognitoIdentityProviderClient([
-                    'region' => COGNITO_REGION,
-                    'version' => 'latest'
-                ]);
-                
-                $client->adminDeleteUser([
-                    'UserPoolId' => COGNITO_USER_POOL_ID,
-                    'Username' => $user_email
-                ]);
-                
-                error_log("Cognito user deleted by admin: $user_email");
-                $cognito_message = " and Cognito";
-                
-            } catch (Exception $e) {
-                $error_message = $e->getMessage();
-                error_log("Cognito delete failed for user {$user_email}: " . $error_message);
-                
-                if (strpos($error_message, 'UserNotFoundException') !== false) {
-                    $cognito_message = " (Cognito user not found)";
-                } else {
-                    // Don't throw, just log - we still want to delete from database
-                    error_log("Continuing with database deletion despite Cognito error");
-                }
-            }
-        }
-        
-        // 2. Delete from database
+
         $delete_stmt = $mysqli->prepare("DELETE FROM users WHERE USER_ID = ?");
         $delete_stmt->bind_param("s", $user_id);
         
@@ -615,7 +578,7 @@ function deleteUserCompletely($user_id, $user_email) {
         // Commit transaction
         $mysqli->commit();
         
-        return "User $user_id successfully deleted from database$cognito_message!";
+        return "User $user_id successfully deleted from database!";
         
     } catch (Exception $e) {
         $mysqli->rollback();

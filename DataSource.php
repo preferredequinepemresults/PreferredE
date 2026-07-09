@@ -18,17 +18,51 @@ namespace Phppot;
 class DataSource
 {
 
-    // PHP 7.1.0 visibility modifiers are allowed for class constants.
-    // when using above 7.1.0, declare the below constants as private
-    const HOST = 'preferredequinesalesresultsdatabase.cdq66kiey6co.us-east-1.rds.amazonaws.com';
-
-    const USERNAME = 'preferredequine';
-
-    const PASSWORD = '914MoniMaker77$$';
-
-    const DATABASENAME = 'horse';
-
     private $conn;
+
+    private static function loadEnv()
+    {
+        static $loaded = false;
+        if ($loaded) {
+            return;
+        }
+        $loaded = true;
+
+        $path = __DIR__ . '/.env';
+        if (! is_readable($path)) {
+            return;
+        }
+
+        foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#' || strpos($line, '=') === false) {
+                continue;
+            }
+
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value, " \t\n\r\0\x0B\"'");
+            if (getenv($key) === false) {
+                putenv($key . '=' . $value);
+                $_ENV[$key] = $value;
+            }
+        }
+    }
+
+    private static function env($name, $default = '')
+    {
+        self::loadEnv();
+
+        $value = getenv($name);
+        if ($value === false && isset($_ENV[$name])) {
+            $value = $_ENV[$name];
+        }
+        if ($value === false && isset($_SERVER[$name])) {
+            $value = $_SERVER[$name];
+        }
+
+        return $value === false ? $default : $value;
+    }
 
     /**
      * PHP implicitly takes care of cleanup for default connection types.
@@ -54,7 +88,12 @@ class DataSource
     public function getConnection()
     {
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-        $conn = new \mysqli(self::HOST, self::USERNAME, self::PASSWORD, self::DATABASENAME);
+        $conn = new \mysqli(
+            self::env('DB_HOST', '64.176.210.96'),
+            self::env('DB_USER'),
+            self::env('DB_PASS'),
+            self::env('DB_NAME', 'preferred_equine_staging')
+        );
 
         if (mysqli_connect_errno()) {
             trigger_error("Problem with connecting to database.");

@@ -16,7 +16,7 @@ include("./header.php");
 include("./session_page.php");
 require_once("config.php");
 require_once("db-settings.php");
-require_once("cognito.php");
+require_once("auth.php");
 
 // Get user details for display
 $username = $_SESSION['UserName'];
@@ -55,41 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $update_stmt->bind_param("ssss", $first_name, $last_name, $contact, $email);
 
             if ($update_stmt->execute()) {
-                // Also update in Cognito if user is verified
-                if ($user['cognito_verified'] == 1) {
-                    try {
-                        require_once 'vendor/autoload.php';
-
-                        $client = new Aws\CognitoIdentityProvider\CognitoIdentityProviderClient([
-                            'region' => COGNITO_REGION,
-                            'version' => 'latest'
-                        ]);
-
-                        // Update user attributes in Cognito
-                        $client->adminUpdateUserAttributes([
-                            'UserPoolId' => COGNITO_USER_POOL_ID,
-                            'Username' => $email,
-                            'UserAttributes' => [
-                                [
-                                    'Name' => 'given_name',
-                                    'Value' => $first_name
-                                ],
-                                [
-                                    'Name' => 'family_name',
-                                    'Value' => $last_name
-                                ]
-                            ]
-                        ]);
-
-                        error_log("Cognito profile updated for: $email");
-                    } catch (Exception $e) {
-                        error_log("Cognito attribute update failed: " . $e->getMessage());
-                        // Don't fail the profile update if Cognito fails
-                        $message = "Profile updated in database but Cognito sync failed. Contact support if needed.";
-                        $message_type = "info";
-                    }
-                }
-
                 // Update session
                 $_SESSION['UserFirstName'] = $first_name;
                 $_SESSION['UserLastName'] = $last_name;
@@ -135,93 +100,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif (!preg_match('/[\W_]/', $new_password)) {
                 $message = "Password must contain at least one special character";
                 $message_type = "error";
-            } elseif ($user['PASSWORD'] === $current_password) {
-
-                // Try to update in Cognito first (if user is verified)
-                $cognito_success = false;
-                $cognito_error = '';
-
-                if ($user['cognito_verified'] == 1) {
-                    try {
-                        require_once 'vendor/autoload.php';
-
-                        $client = new Aws\CognitoIdentityProvider\CognitoIdentityProviderClient([
-                            'region' => COGNITO_REGION,
-                            'version' => 'latest'
-                        ]);
-
-                        // Method 1: Using admin privileges (IAM role) - doesn't require current password
-                        // This is simpler and more reliable
-                        try {
-                            $client->adminSetUserPassword([
-                                'UserPoolId' => COGNITO_USER_POOL_ID,
-                                'Username' => $email,
-                                'Password' => $new_password,
-                                'Permanent' => true
-                            ]);
-
-                            $cognito_success = true;
-                            error_log("Cognito password updated via admin for: $email");
-                        } catch (Exception $adminError) {
-                            // If admin method fails, try the user authentication method
-                            error_log("Admin password set failed, trying user auth: " . $adminError->getMessage());
-
-                            // First authenticate to get the access token
-                            $auth_result = $client->initiateAuth([
-                                'AuthFlow' => 'USER_PASSWORD_AUTH',
-                                'ClientId' => COGNITO_APP_CLIENT_ID,
-                                'AuthParameters' => [
-                                    'USERNAME' => $email,
-                                    'PASSWORD' => $current_password
-                                ]
-                            ]);
-
-                            if (isset($auth_result['AuthenticationResult'])) {
-                                $access_token = $auth_result['AuthenticationResult']['AccessToken'];
-
-                                // Change password in Cognito
-                                $client->changePassword([
-                                    'AccessToken' => $access_token,
-                                    'PreviousPassword' => $current_password,
-                                    'ProposedPassword' => $new_password
-                                ]);
-
-                                $cognito_success = true;
-                                error_log("Cognito password updated via user auth for: $email");
-                            }
-                        }
-                    } catch (Exception $e) {
-                        $cognito_error = $e->getMessage();
-                        error_log("Cognito password change failed for {$email}: " . $cognito_error);
-                    }
-                } else {
-                    // User not verified in Cognito, just update database
-                    $cognito_success = true; // Treat as success since no Cognito sync needed
-                }
-
-                // Update password in database (always do this)
-                $update_stmt = $mysqli->prepare("UPDATE users SET PASSWORD = ? WHERE USERNAME = ?");
-                $update_stmt->bind_param("ss", $new_password, $email);
-
-                if ($update_stmt->execute()) {
-                    if ($cognito_success) {
-                        $message = "Password changed successfully in both database and Cognito!";
-                        $message_type = "success";
-                    } elseif ($user['cognito_verified'] == 1) {
-                        $message = "Password updated in database but Cognito sync failed. Error: " . $cognito_error;
-                        $message_type = "warning";
-                    } else {
-                        $message = "Password changed successfully in database. Verify your email to enable Cognito sync.";
-                        $message_type = "success";
-                    }
-                } else {
-                    $message = "Error changing password in database: " . $update_stmt->error;
-                    $message_type = "error";
-                }
-                $update_stmt->close();
             } else {
-                $message = "Current password is incorrect!";
-                $message_type = "error";
+                $needs_rehash = false;
+                $current_password_valid = auth_verify_password($current_password, $user['PASSWORD'] ?? '', $needs_rehash);
+
+                if (!$current_password_valid) {
+                    $message = "Current password is incorrect!";
+                    $message_type = "error";
+                } else {
+                    $hashed_password = auth_hash_password($new_password);
+                    $update_stmt = $mysqli->prepare("UPDATE users SET PASSWORD = ? WHERE USERNAME = ?");
+                    $update_stmt->bind_param("ss", $hashed_password, $email);
+
+                    if ($update_stmt->execute()) {
+                        $message = "Password changed successfully!";
+                        $message_type = "success";
+                    } else {
+                        $message = "Error changing password in database: " . $update_stmt->error;
+                        $message_type = "error";
+                    }
+                    $update_stmt->close();
+                }
             }
         }
 
@@ -233,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($confirm_delete !== 'DELETE') {
                 $message = "Please type 'DELETE' to confirm account deletion";
                 $message_type = "error";
-            } elseif ($delete_password !== $user['PASSWORD']) {
+            } elseif (!auth_verify_password($delete_password, $user['PASSWORD'] ?? '')) {
                 $message = "Password is incorrect!";
                 $message_type = "error";
             } else {
@@ -241,30 +140,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mysqli->begin_transaction();
 
                 try {
-                    // 1. Delete from Cognito if verified
-                    if ($user['cognito_verified'] == 1) {
-                        try {
-                            require_once 'vendor/autoload.php';
-
-                            $client = new Aws\CognitoIdentityProvider\CognitoIdentityProviderClient([
-                                'region' => COGNITO_REGION,
-                                'version' => 'latest'
-                            ]);
-
-                            // Delete user from Cognito
-                            $client->adminDeleteUser([
-                                'UserPoolId' => COGNITO_USER_POOL_ID,
-                                'Username' => $email
-                            ]);
-
-                            error_log("Cognito user deleted: $email");
-                        } catch (Exception $e) {
-                            error_log("Cognito delete failed: " . $e->getMessage());
-                            // Continue with database deletion even if Cognito fails
-                        }
-                    }
-
-                    // 2. Delete from database
                     $delete_stmt = $mysqli->prepare("DELETE FROM users WHERE EMAIL = ?");
                     $delete_stmt->bind_param("s", $email);
 
@@ -818,15 +693,9 @@ $role_names = [
                 <div class="user-role">
                     <?php echo $role_names[$user['USERROLE'] ?? 'user']; ?>
                 </div>
-                <?php if ($user['cognito_verified'] == 1): ?>
-                    <span class="verification-badge badge-verified" style="margin-top: 15px;">
-                        <i class="fa fa-check-circle"></i> Verified in Cognito
-                    </span>
-                <?php else: ?>
-                    <span class="verification-badge badge-unverified" style="margin-top: 15px;">
-                        <i class="fa fa-exclamation-triangle"></i> Email Not Verified
-                    </span>
-                <?php endif; ?>
+                <span class="verification-badge badge-verified" style="margin-top: 15px;">
+                    <i class="fa fa-check-circle"></i> Active Account
+                </span>
             </div>
 
             <div class="account-menu">
@@ -1000,16 +869,6 @@ $role_names = [
                     <div class="password-hint">
                         <strong>Password Requirements:</strong> Minimum 8 characters with uppercase, lowercase, number, and special character
                     </div>
-
-                    <?php if ($user['cognito_verified'] == 1): ?>
-                        <div style="margin-bottom: 15px; font-size: 13px; color: #28a745;">
-                            <i class="fa fa-check-circle"></i> Your password will be synchronized with Cognito
-                        </div>
-                    <?php else: ?>
-                        <div style="margin-bottom: 15px; font-size: 13px; color: #856404;">
-                            <i class="fa fa-info-circle"></i> Verify your email to enable Cognito password sync
-                        </div>
-                    <?php endif; ?>
 
                     <button type="submit" name="change_password" class="btn-primary">
                         <i class="fa fa-key"></i> Change Password

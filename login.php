@@ -316,6 +316,7 @@ ob_end_flush();
             <input type="text" class="form-control"
                 id="username"
                 name="username"
+                autocomplete="username"
                 placeholder="Enter your email or username"
                 value="<?php echo htmlspecialchars($form_data['username'] ?? ''); ?>"
                 required
@@ -328,6 +329,7 @@ ob_end_flush();
                 <input type="password" class="form-control"
                     id="password"
                     name="password"
+                    autocomplete="current-password"
                     placeholder="Enter your password"
                     required>
                 <button type="button" class="toggle-password" onclick="togglePassword('password', this)" tabindex="-1">

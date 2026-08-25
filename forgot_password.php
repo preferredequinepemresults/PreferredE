@@ -563,7 +563,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_code']) && iss
     <form method="POST" action="" id="requestForm">
         <div class="form-group">
             <label for="email">Email Address</label>
-            <input type="email" class="form-control" id="email" name="email" 
+            <input type="email" class="form-control" id="email" name="email" autocomplete="username"
                    placeholder="Enter your email address" value="<?php echo htmlspecialchars($email); ?>" required>
         </div>
         
@@ -577,13 +577,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_code']) && iss
     <?php if ($show_reset_form): ?>
     <form method="POST" action="" id="resetForm">
         <div class="form-group">
-            <label>Email Address</label>
-            <input type="text" class="form-control" value="<?php echo htmlspecialchars($email); ?>" readonly>
+            <label for="reset_email">Email Address</label>
+            <input type="email" class="form-control" id="reset_email" name="username" autocomplete="username"
+                   value="<?php echo htmlspecialchars($email); ?>" readonly>
         </div>
         
         <div class="form-group">
             <label for="code">Reset Code</label>
-            <input type="text" class="form-control code-input" id="code" name="code" 
+            <input type="text" class="form-control code-input" id="code" name="code" autocomplete="one-time-code"
                    placeholder="Enter 6-digit code" required maxlength="6" pattern="[0-9]{6}" inputmode="numeric">
             <small style="color: #666; font-size: 13px;">Check your email for the 6-digit reset code</small>
         </div>
@@ -591,7 +592,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_code']) && iss
         <div class="form-group">
             <label for="new_password">New Password</label>
             <div class="password-wrapper">
-                <input type="password" class="form-control" id="new_password" name="new_password" 
+                <input type="password" class="form-control" id="new_password" name="new_password" autocomplete="new-password"
                        placeholder="Enter new password" required>
                 <button type="button" class="toggle-password" onclick="togglePassword('new_password', this)" tabindex="-1">
                     <i class="fa fa-eye"></i>
@@ -602,7 +603,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_code']) && iss
         <div class="form-group">
             <label for="confirm_password">Confirm New Password</label>
             <div class="password-wrapper">
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" autocomplete="new-password"
                        placeholder="Confirm new password" required>
                 <button type="button" class="toggle-password" onclick="togglePassword('confirm_password', this)" tabindex="-1">
                     <i class="fa fa-eye"></i>

@@ -5,6 +5,7 @@ include("./header.php");
 require_once("config.php");
 require_once("db-settings.php");
 require_once("auth.php");
+require_once("mailer.php");
 
 $message = '';
 $message_type = ''; // success, error, info
@@ -13,14 +14,7 @@ $email = '';
 
 function send_password_reset_code($email, $reset_code)
 {
-    $host = $_SERVER['HTTP_HOST'] ?? 'preferredequine.com';
-    $to = $email;
     $subject = "Password Reset Code";
-
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: noreply@" . $host . "\r\n";
-    $headers .= "Reply-To: support@" . $host . "\r\n";
 
     $safe_code = htmlspecialchars($reset_code, ENT_QUOTES, 'UTF-8');
     $year = date('Y');
@@ -67,7 +61,19 @@ function send_password_reset_code($email, $reset_code)
     </body>
     </html>";
 
-    return mail($to, $subject, $email_body, $headers);
+    $text_body = "Password Reset Request\n\n"
+        . "Use this code to reset your Preferred Equine password: {$reset_code}\n\n"
+        . "This code expires in 1 hour. If you did not request this reset, you can ignore this email.";
+
+    return sendgrid_send_email($email, $subject, $email_body, $text_body);
+}
+
+function clear_password_reset_code($mysqli, $email)
+{
+    $clear_code = $mysqli->prepare("UPDATE users SET reset_code = NULL, reset_code_expiry = NULL WHERE EMAIL = ?");
+    $clear_code->bind_param("s", $email);
+    $clear_code->execute();
+    $clear_code->close();
 }
 
 function create_password_reset_code($mysqli, $email)
@@ -115,6 +121,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $message_type = "success";
                     $show_reset_form = true;
                 } else {
+                    if ($reset_code) {
+                        clear_password_reset_code($mysqli, $email);
+                    }
                     $message = "Failed to send reset code. Please try again.";
                     $message_type = "error";
                 }
@@ -215,7 +224,7 @@ if (!$email && isset($_SESSION['reset_email'])) {
     $show_reset_form = true;
 }
 
-if (isset($_GET['resend']) && $_GET['resend'] == 1 && isset($_SESSION['reset_email'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_code']) && isset($_SESSION['reset_email'])) {
     $email = $_SESSION['reset_email'];
     $reset_code = create_password_reset_code($mysqli, $email);
 
@@ -224,6 +233,9 @@ if (isset($_GET['resend']) && $_GET['resend'] == 1 && isset($_SESSION['reset_ema
         $message_type = "success";
         $show_reset_form = true;
     } else {
+        if ($reset_code) {
+            clear_password_reset_code($mysqli, $email);
+        }
         $message = "Failed to send a new reset code. Please try again.";
         $message_type = "error";
         $show_reset_form = true;
@@ -500,13 +512,16 @@ if (isset($_GET['resend']) && $_GET['resend'] == 1 && isset($_SESSION['reset_ema
     margin-top: 15px;
 }
 
-.resend-link a {
+.resend-button {
+    border: 0;
+    padding: 0;
+    background: transparent;
     color: #2E4053;
-    text-decoration: none;
     font-size: 14px;
+    cursor: pointer;
 }
 
-.resend-link a:hover {
+.resend-button:hover {
     text-decoration: underline;
 }
 
@@ -612,7 +627,7 @@ if (isset($_GET['resend']) && $_GET['resend'] == 1 && isset($_SESSION['reset_ema
         </button>
         
         <div class="resend-link">
-            <a href="?resend=1"><i class="fa fa-refresh"></i> Resend reset code</a>
+            <button type="submit" name="resend_code" class="resend-button" formnovalidate><i class="fa fa-refresh"></i> Resend reset code</button>
         </div>
     </form>
     <?php endif; ?>
@@ -762,19 +777,19 @@ if (document.getElementById('resetForm')) {
 // Countdown timer for resend (optional)
 if (document.querySelector('.resend-link')) {
     let seconds = 60;
-    const resendLink = document.querySelector('.resend-link a');
+    const resendLink = document.querySelector('.resend-button');
     const originalText = resendLink.innerHTML;
     
     function updateTimer() {
         if (seconds > 0) {
             resendLink.innerHTML = `<i class="fa fa-hourglass-half"></i> Resend in ${seconds}s`;
-            resendLink.style.pointerEvents = 'none';
+            resendLink.disabled = true;
             resendLink.style.opacity = '0.5';
             seconds--;
             setTimeout(updateTimer, 1000);
         } else {
             resendLink.innerHTML = originalText;
-            resendLink.style.pointerEvents = 'auto';
+            resendLink.disabled = false;
             resendLink.style.opacity = '1';
         }
     }
